@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Game danh bong</title>
+</head>
+<body>
+<center>
+    <canvas id="myCanvas" style="border: 3px solid olivedrab"></canvas>
+</center>
+
+</body>
+</html>
+<script>
+    canvas = document.getElementById("myCanvas");
+    canvas.height = 750;
+    canvas.width = 500;
+    let ctx = canvas.getContext('2d');
+    let gameOver = false;
+
+    function getRandomHex() {
+        return Math.floor(Math.random() * 255);
+    }
+
+    function getRandomColor() {
+        let red = getRandomHex();
+        let green = getRandomHex();
+        let blue = getRandomHex();
+        return "rgb(" + red + "," + blue + "," + green + ")";
+    }
+
+    function Circle(x, y, radius, speedX, speedY, color) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.speedX = speedX;
+        this.speedY = speedY;
+        this.color = color;
+
+        this.draw = function () {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.fillStyle = this.color;
+
+        }
+
+        this.update = function () {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            // cham 2 canh ben
+            if (this.x < 0 || this.x > canvas.width) {
+                this.speedX = -this.speedX;
+            }
+            // cham canh tren
+            if (this.y < 0) {
+                this.speedY = -this.speedY;
+            }
+
+            if (this.y >= 750) {
+                this.speedY = 0;
+                this.speedX = 0;
+                ctx.beginPath();
+                ctx.font = "50px Arial";
+                ctx.fillText("GAME OVER", 100, 300);
+                ctx.strokeText("GAME OVER", 100, 300);
+                gameOver = true;
+            }
+        }
+    }
+
+    function check() {
+        console.log(circle.radius)
+        if (circle.y + circle.radius == rectangle.y && (circle.x + circle.radius) >= rectangle.x && (circle.x + circle.radius) <= (rectangle.x + rectangle.width)) {
+            circle.speedY = -circle.speedY;
+            score.value++;
+            score.color2 = getRandomColor();
+            circle.speedX -= 1
+            circle.speedY -= 1
+
+        }
+    }
+
+    function Rectangle(x, y, width, height, color1) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.color1 = color1;
+        this.speed1 = 50;
+
+        this.draw = function () {
+            ctx.beginPath();
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+            ctx.strokeRect(this.x, this.y, this.width, this.height);
+            ctx.fillStyle = this.color1;
+
+        }
+        this.moveLeft = function () {
+            if (this.x < 0)
+                return;
+            this.x -= this.speed1;
+        }
+        this.moveRight = function () {
+            if (this.x > canvas.width - rectangle.width)
+                return;
+            this.x += this.speed1;
+        }
+    }
+
+    function Score(value, x, y, color2) {
+        this.x = x;
+        this.y = y;
+        this.value = value;
+        this.color2 = color2;
+        this.draw = function () {
+            ctx.beginPath();
+            ctx.font = "50px Arial";
+            ctx.fillText("Your score: " + this.value, this.x, this.y);
+            ctx.strokeText("Your score: " + this.value, this.x, this.y);
+            ctx.fillStyle = this.color2;
+
+        }
+    }
+
+    let circle = new Circle(100, 100, 10, 5, 5, "#0000FF");
+    console.log(circle)
+    let score = new Score(0, 100, 100, "#000000");
+    let rectangle = new Rectangle(100, 650, 200, 30, "#FF0000");
+
+    function moveSelection(event) {
+        switch (event.keyCode) {
+            case 37:
+                rectangle.moveLeft();
+                break;
+            case 39:
+                rectangle.moveRight();
+                break;
+        }
+    }
+
+    function moveRectangle() {
+        window.addEventListener("keydown", moveSelection);
+    }
+
+    moveRectangle();
+
+    function animate() {
+        if (!gameOver) {
+            requestAnimationFrame(animate)
+        } else {
+            return;
+        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        circle.draw();
+        rectangle.draw();
+        score.draw();
+        circle.update();
+        check();
+    }
+console.log(ctx)
+    animate();
+</script>
